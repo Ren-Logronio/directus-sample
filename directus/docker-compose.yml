@@ -12,7 +12,7 @@ services:
       KEY: "some-key"
       SECRET: "some-secret"
       CORS_ENABLED: "true"
-      CORS_ORIGIN: "*"
+      CORS_ORIGIN: "http://localhost:5173"
       ADMIN_EMAIL: "reinhart.logronio@msugensan.edu.ph"
       ADMIN_PASSWORD: "0ri0nMC10!"
       DB_CLIENT: "sqlite3"

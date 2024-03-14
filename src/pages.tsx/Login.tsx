@@ -10,6 +10,7 @@ export default function Login() {
     const loginHandler = async () => {
         setLoginForm({ ...loginForm, loading: true });
         directusClient.login(loginForm.email, loginForm.password).then(res => {
+            cookie.set("access_token", res.access_token || "");
             cookie.set("refresh_token", res.refresh_token || "");
             setLoginForm({ email: "", password: "", loading: false });
             navigate("/dashboard");

@@ -1,36 +1,22 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { Navigate } from "react-router-dom";
 import { directusClient } from "../directus";
 import { refresh } from "@directus/sdk";
+import cookie from "cookiejs";
 
 export default function Protected({ children }: { children: React.ReactNode }) {
-    const [loading, setLoading] = useState(false);
-    const [token, setToken] = useState("x");
+    const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState("");
 
-    // const refreshToken = localStorage.getItem("refresh_token") || "";
-
-    // directusClient.request(refresh('cookie')).then(res => {
-    //     console.log("refreshed:", res);
-    // }).catch(err => {
-    //     console.log("error:", err);
-    // });
-
-    // directusClient.getToken().then(val => {
-    //     if (!val) {
-    //         directusClient.refresh().then(res => {
-    //             console.log(res)
-    //         }).catch(err => {
-    //             console.log("error:", err);
-    //         });
-    //         return;
-    //     }
-
-    //     setToken(val);
-    // }).catch(err => {
-    //     console.log("error:", err);
-    // }).finally(() => {
-    //     setLoading(false);
-    // });
+    useEffect(() => {
+        directusClient.request(refresh('json', cookie.get("refresh_token") || "x" as any)).then(res => {
+            setToken(res.access_token || "");
+        }).catch(err => {
+            console.log("error:", err);
+        }).then(() => {
+            loading && setLoading(false);
+        });
+    }, []);
 
     return <>
         {
