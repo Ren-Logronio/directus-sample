@@ -3,14 +3,12 @@ import { Navigate, useLocation } from "react-router-dom";
 import { UserContext } from "./UserProvider";
 
 export default function Protected({ children }: { children: React.ReactNode }) {
-    const { user } = useContext<any>(UserContext);
-
-    useEffect(() => {
-        console.log("user:", user);
-    }, [])
+    const { user, loading } = useContext<any>(UserContext);
 
     return <>
-        {
+        {loading ?
+            <p>Wait...</p>
+            :
             <>
                 {
                     !!user ?

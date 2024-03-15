@@ -1,7 +1,7 @@
 import { AuthenticationData, AuthenticationStorage } from "@directus/sdk";
 import cookie from "cookiejs";
 
-export const authLocalStorage = (mainKey: string = "directus_storage") => ({
+export const authLocalStorage = (mainKey: string = import.meta.env.VITE_DIRECTUS_CLIENT_AUTH_STORAGE_NAME) => ({
     // implementation of get, here return json parsed data from localStorage at mainKey (or null if not found)
     get: async () => {
         const data = cookie.get(mainKey);
