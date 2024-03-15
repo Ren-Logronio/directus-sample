@@ -1,32 +1,37 @@
 import { useEffect, useState } from "preact/hooks";
 import { directusClient } from "../directus";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import cookie from "cookiejs";
+import axios from "axios";
+import { readMe } from "@directus/sdk";
 
 export default function Login() {
     const navigate = useNavigate();
+    const [urlSearchParams, setUrlSearchParams] = useSearchParams();
     const [loginForm, setLoginForm] = useState({ email: "", password: "", loading: false });
 
     const loginHandler = async () => {
         setLoginForm({ ...loginForm, loading: true });
         directusClient.login(loginForm.email, loginForm.password).then(res => {
-            cookie.set("access_token", res.access_token || "");
-            cookie.set("refresh_token", res.refresh_token || "");
             setLoginForm({ email: "", password: "", loading: false });
-            navigate("/dashboard");
+            navigate("/home");
         }).catch(err => {
             console.log("error:", err)
             setLoginForm({ ...loginForm, loading: false });
         });
-    }
+    };
 
     useEffect(() => {
-        directusClient.getToken().then(val => {
-            if (val) {
-                navigate("/dashboard");
-            }
+        directusClient.request(readMe()).then(res => {
+            if (urlSearchParams.get('logout') !== null) {
+                directusClient.logout();
+                return;
+            };
+            navigate("/home");
+        }).catch(err => {
+            console.log("not logged in");
         });
-    }, [])
+    }, []);
 
     return <>
         Login

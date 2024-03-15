@@ -1,8 +1,18 @@
-import { createDirectus, authentication, graphql, rest } from '@directus/sdk';
+import { createDirectus, authentication, graphql, rest, DirectusClient, GraphqlClient, RestClient, AuthenticationClient } from '@directus/sdk';
+import { authLocalStorage } from '../util/authStorage';
 
-export const directusClient = createDirectus(import.meta.env.VITE_DIRECTUS_CLIENT_HOST || 'http://localhost:8055', {
+export class DirectusSingleton {
+    private static instance: DirectusClient<any> & GraphqlClient<any> & RestClient<any> & AuthenticationClient<any>;
 
-})
-    .with(authentication("json", { credentials: 'include' }))
-    .with(graphql({ credentials: 'include' }))
-    .with(rest({ credentials: 'include' }));
+    public static getInstance(rebuild = false): DirectusClient<any> & GraphqlClient<any> & RestClient<any> & AuthenticationClient<any> {
+        if (!DirectusSingleton.instance || rebuild) {
+            DirectusSingleton.instance = createDirectus(import.meta.env.VITE_DIRECTUS_CLIENT_HOST)
+                .with(graphql({ credentials: 'include' }))
+                .with(rest({ credentials: 'include' }))
+                .with(authentication("json", { credentials: 'include', storage: authLocalStorage() }));
+        };
+        return DirectusSingleton.instance;
+    };
+};
+
+export const directusClient = DirectusSingleton.getInstance();

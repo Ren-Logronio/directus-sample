@@ -1,35 +1,24 @@
-import { useEffect, useState } from "preact/hooks";
-import { Navigate } from "react-router-dom";
-import { directusClient } from "../directus";
-import { refresh } from "@directus/sdk";
-import cookie from "cookiejs";
+import { StateUpdater, useContext, useEffect, useState } from "preact/hooks";
+import { Navigate, useLocation } from "react-router-dom";
+import { UserContext } from "./UserProvider";
 
 export default function Protected({ children }: { children: React.ReactNode }) {
-    const [loading, setLoading] = useState(true);
-    const [token, setToken] = useState("");
+    const { user } = useContext<any>(UserContext);
 
     useEffect(() => {
-        directusClient.request(refresh('json', cookie.get("refresh_token") || "x" as any)).then(res => {
-            setToken(res.access_token || "");
-        }).catch(err => {
-            console.log("error:", err);
-        }).then(() => {
-            loading && setLoading(false);
-        });
-    }, []);
+        console.log("user:", user);
+    }, [])
 
     return <>
         {
-            loading ? <p>Wait...</p>
-                :
-                <>
-                    {
-                        token ?
-                            <>{children}</>
-                            :
-                            <Navigate to="/login" />
-                    }
-                </>
+            <>
+                {
+                    !!user ?
+                        <>{children}</>
+                        :
+                        <Navigate to="/login" />
+                }
+            </>
         }
     </>;
 }
